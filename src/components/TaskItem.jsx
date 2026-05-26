@@ -72,7 +72,7 @@ export function TaskItem({
       {...listeners}
     >
       <div
-        className={`flex w-full items-start gap-3 rounded-xl bg-[var(--color-surface)] px-4 py-3.5 ${
+        className={`flex w-full items-center gap-3 rounded-xl bg-[var(--color-surface)] px-4 py-3.5 ${
           isDragging ? 'ring-1 ring-[var(--color-border)]' : ''
         }`}
       >
@@ -118,7 +118,7 @@ export function TaskItem({
           {isEditing ? (
             <input
               ref={inputRef}
-              type="text"
+              type="textarea"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onBlur={saveEdit}
