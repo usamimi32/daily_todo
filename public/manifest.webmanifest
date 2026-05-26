@@ -1,0 +1,19 @@
+{
+  "name": "今日のToDo",
+  "short_name": "ToDo",
+  "description": "毎日リセットされる1日限定のToDoアプリ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#fcf2f2",
+  "orientation": "portrait",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+@import 'tailwindcss';
+
+/* iPhone Safari 向け · 柔らかく読みやすいベース */
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    font-family:
+      'Hiragino Sans',
+      'Hiragino Kaku Gothic ProN',
+      -apple-system,
+      BlinkMacSystemFont,
+      'Yu Gothic UI',
+      'Yu Gothic',
+      Meiryo,
+      sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    transition:
+      background-color 0.35s ease,
+      color 0.35s ease;
+  }
+
+  #root {
+    min-height: 100dvh;
+  }
+
+  /* テーマ用 CSS 変数の初期値（ペールレッド） */
+  :root {
+    --color-bg: #fcf2f2;
+    --color-surface: #fff9f9;
+    --color-accent: #e88a8a;
+    --color-accent-soft: #fce4e4;
+    --color-accent-hover: #d47070;
+    --color-text: #6b4a4a;
+    --color-title: #5a3e3e;
+    --color-text-muted: #a88080;
+    --color-border: #f0cccc;
+    --color-checkbox: #d47070;
+    --color-shadow: rgba(212, 112, 112, 0.14);
+  }
+}
