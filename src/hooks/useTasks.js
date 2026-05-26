@@ -15,6 +15,10 @@ export function useTasks(onDataChange) {
   const [tasks, setTasks] = useState(() => normalizeTasks(loadTasks()))
   const [todayKey, setTodayKey] = useState(() => getTodayKey())
 
+  const reloadTasks = useCallback((nextTasks) => {
+    setTasks(normalizeTasks(nextTasks ?? loadTasks()))
+  }, [])
+
   const displayTasks = useMemo(() => sortTasksForDisplay(tasks), [tasks])
 
   useEffect(() => {
@@ -89,5 +93,6 @@ export function useTasks(onDataChange) {
     toggleTask,
     updateTask,
     reorderTasks,
+    reloadTasks,
   }
 }

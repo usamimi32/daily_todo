@@ -2,6 +2,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
+import { DragHandle } from './DragHandle'
 
 /**
  * 1件のタスク行（dnd-kit 本体 + 打ち消し線のみ Framer Motion）
@@ -71,7 +72,7 @@ export function TaskItem({
       {...listeners}
     >
       <div
-        className={`flex w-full items-start gap-3.5 rounded-xl bg-[var(--color-surface)] px-4 py-3.5 ${
+        className={`flex w-full items-start gap-3 rounded-xl bg-[var(--color-surface)] px-4 py-3.5 ${
           isDragging ? 'ring-1 ring-[var(--color-border)]' : ''
         }`}
       >
@@ -163,6 +164,9 @@ export function TaskItem({
             </button>
           )}
         </div>
+
+        {/* 並び替えハンドル（表示のみ）— 将来 dragListeners={listeners} を渡して li 側の listeners を外す */}
+        <DragHandle className="min-h-[2.75rem] min-w-[2rem] -mr-1" />
       </div>
     </li>
   )

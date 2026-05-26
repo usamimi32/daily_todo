@@ -42,3 +42,10 @@ export function dateKeyToLocalDate(dateKey) {
   const [y, m, d] = dateKey.split('-').map(Number)
   return new Date(y, m - 1, d)
 }
+
+/** 前日の日付キー */
+export function getYesterdayKey(date = new Date()) {
+  const prev = new Date(date)
+  prev.setDate(prev.getDate() - 1)
+  return getTodayKey(prev)
+}

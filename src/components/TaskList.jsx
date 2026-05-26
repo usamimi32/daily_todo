@@ -14,6 +14,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { useMemo, useState } from 'react'
+import { DragHandle } from './DragHandle'
 import { EmptyState } from './EmptyState'
 import { TaskItem } from './TaskItem'
 
@@ -92,7 +93,7 @@ export function TaskList({ tasks, onToggle, onUpdate, onReorder }) {
 
       <DragOverlay dropAnimation={{ duration: 160, easing: 'ease-out' }}>
         {activeTask ? (
-          <div className="flex items-start gap-3.5 rounded-xl bg-[var(--color-surface)] px-4 py-3.5 shadow-md ring-1 ring-[var(--color-border)]">
+          <div className="flex items-start gap-3 rounded-xl bg-[var(--color-surface)] px-4 py-3.5 shadow-md ring-1 ring-[var(--color-border)]">
             <span
               className={`mt-1 flex h-[1.375rem] w-[1.375rem] shrink-0 items-center justify-center rounded-full border ${
                 activeTask.completed
@@ -100,9 +101,10 @@ export function TaskList({ tasks, onToggle, onUpdate, onReorder }) {
                   : 'border-[var(--color-border)]'
               }`}
             />
-            <span className="text-[1rem] leading-relaxed text-[var(--color-text)]">
+            <span className="min-w-0 flex-1 text-[1rem] leading-relaxed text-[var(--color-text)]">
               {activeTask.text}
             </span>
+            <DragHandle className="min-h-[2.75rem] min-w-[2rem] -mr-1" />
           </div>
         ) : null}
       </DragOverlay>

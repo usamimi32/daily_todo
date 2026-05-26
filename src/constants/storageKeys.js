@@ -8,4 +8,6 @@ export const STORAGE_KEYS = {
   TASKS_LEGACY: 'daily-todo-tasks',
   /** 選択中のテーマ */
   THEME: 'daily-todo-theme',
+  /** 未完了タスクの引き継ぎ設定（reset | carryover） */
+  CARRYOVER_MODE: 'daily-todo-carryover-mode',
 }

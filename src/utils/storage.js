@@ -1,7 +1,10 @@
+import { CARRYOVER_MODE } from '../constants/carryover'
 import { STORAGE_KEYS } from '../constants/storageKeys'
 import { DEFAULT_THEME_ID, LEGACY_THEME_MAP, THEMES } from '../constants/themes'
+import { buildCarriedOverTasks } from './carryoverTasks'
 import { computeStats } from './dailyData'
-import { getTodayKey } from './date'
+import { getTodayKey, getYesterdayKey } from './date'
+import { normalizeTasks } from './taskOrder'
 
 /**
  * LocalStorage の読み書き
@@ -38,16 +41,53 @@ export function getDayRecord(dateKey) {
   return data[dateKey] ?? null
 }
 
-/** 当日のタスク一覧を読み込む */
+/** 引き継ぎ設定を読み込む（未設定なら null） */
+export function loadCarryoverMode() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEYS.CARRYOVER_MODE)
+    if (saved === CARRYOVER_MODE.RESET || saved === CARRYOVER_MODE.CARRYOVER) {
+      return saved
+    }
+  } catch {
+    // 未設定扱い
+  }
+  return null
+}
+
+/** 初回オンボーディングが必要か（設定未保存） */
+export function needsCarryoverOnboarding() {
+  return loadCarryoverMode() === null
+}
+
+/** 引き継ぎ設定を保存 */
+export function saveCarryoverMode(mode) {
+  localStorage.setItem(STORAGE_KEYS.CARRYOVER_MODE, mode)
+}
+
+function isCarryoverEnabled() {
+  return loadCarryoverMode() === CARRYOVER_MODE.CARRYOVER
+}
+
+/** 当日のタスク一覧を読み込む（引き継ぎ設定に応じて前日分を復元） */
 export function loadTasks() {
   const todayKey = getTodayKey()
   const record = getDayRecord(todayKey)
 
-  if (!record?.tasks || !Array.isArray(record.tasks)) {
+  if (record?.tasks && Array.isArray(record.tasks) && record.tasks.length > 0) {
+    return record.tasks.map((task) => ({ ...task }))
+  }
+
+  if (!isCarryoverEnabled()) {
     return []
   }
 
-  return record.tasks.map((task) => ({ ...task }))
+  const yesterdayKey = getYesterdayKey()
+  const yesterday = getDayRecord(yesterdayKey)
+  if (!yesterday?.tasks?.length) {
+    return []
+  }
+
+  return normalizeTasks(buildCarriedOverTasks(yesterday.tasks))
 }
 
 /** 当日のタスクを保存（達成数も同時更新） */
@@ -58,13 +98,22 @@ export function saveTasks(tasks) {
 
   const cleaned = {}
 
+  const yesterdayKey = getYesterdayKey()
+  const keepYesterdayTasks = isCarryoverEnabled()
+
   Object.entries(data).forEach(([key, record]) => {
     if (!record) return
     if (key === todayKey) return
 
-    cleaned[key] = {
+    const base = {
       completed: record.completed ?? 0,
       total: record.total ?? 0,
+    }
+
+    if (keepYesterdayTasks && key === yesterdayKey && Array.isArray(record.tasks)) {
+      cleaned[key] = { ...base, tasks: record.tasks }
+    } else {
+      cleaned[key] = base
     }
   })
 
