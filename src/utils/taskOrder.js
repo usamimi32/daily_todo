@@ -37,15 +37,15 @@ export function normalizeTasks(tasks) {
 /** 新規タスクを未完了の先頭へ（order を最小より小さく） */
 export function createTaskWithOrder(text, existingTasks) {
   const actives = existingTasks.filter((t) => !t.completed)
-  const minOrder = actives.length
-    ? Math.min(...actives.map((t) => t.order))
+  const maxOrder = actives.length
+    ? Math.max(...actives.map((t) => t.order))
     : ORDER_STEP
 
   return {
     id: crypto.randomUUID(),
     text: text.trim(),
     completed: false,
-    order: minOrder - ORDER_STEP,
+    order: maxOrder + ORDER_STEP,
     createdAt: Date.now(),
   }
 }

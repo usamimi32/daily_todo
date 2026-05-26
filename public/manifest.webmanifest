@@ -1,7 +1,7 @@
 {
-  "name": "今日のToDo",
+  "name": "ToDo",
   "short_name": "ToDo",
-  "description": "毎日リセットされる1日限定のToDoアプリ",
+  "description": "日々のToDoアプリ",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
