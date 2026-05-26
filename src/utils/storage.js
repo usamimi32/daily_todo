@@ -8,7 +8,6 @@ import { normalizeTasks } from './taskOrder'
 
 /**
  * LocalStorage の読み書き
- * 形式: { "2026-05-26": { completed: 3, total: 5, tasks?: [...] } }
  */
 
 let legacyMigrated = false
@@ -41,7 +40,7 @@ export function getDayRecord(dateKey) {
   return data[dateKey] ?? null
 }
 
-/** 引き継ぎ設定を読み込む（未設定なら null） */
+/** 引き継ぎ設定を読み込む */
 export function loadCarryoverMode() {
   try {
     const saved = localStorage.getItem(STORAGE_KEYS.CARRYOVER_MODE)
@@ -54,7 +53,7 @@ export function loadCarryoverMode() {
   return null
 }
 
-/** 初回オンボーディングが必要か（設定未保存） */
+/** 初回オンボーディングが必要か */
 export function needsCarryoverOnboarding() {
   return loadCarryoverMode() === null
 }
@@ -68,44 +67,46 @@ function isCarryoverEnabled() {
   return loadCarryoverMode() === CARRYOVER_MODE.CARRYOVER
 }
 
-/** 指定された日付（または当日）のタスク一覧を読み込む */
-export function loadTasks(dateKey = getTodayKey()) {
-  const record = getDayRecord(dateKey)
-
-  if (record?.tasks && Array.isArray(record.tasks) && record.tasks.length > 0) {
-    return record.tasks.map((task) => ({ ...task }))
-  }
-
-  // 当日かつ引き継ぎ有効の場合のみ前日分を復元
-  if (dateKey === getTodayKey() && isCarryoverEnabled()) {
-    const yesterdayKey = getYesterdayKey()
-    const yesterday = getDayRecord(yesterdayKey)
-    if (yesterday?.tasks?.length) {
-      return normalizeTasks(buildCarriedOverTasks(yesterday.tasks))
-    }
-  }
-
-  return []
+/** 🚨 修正：useTasks.js が求めている「保存データそのもの（オブジェクト）」をそのまま返す */
+export function loadTasks() {
+  return loadAllDailyData()
 }
 
-/** 指定された日付のタスクを保存（達成数も同時更新） */
-export function saveTasks(targetKey, tasks) {
-  // もし第1引数が配列（古い呼び出し形式）だった場合のセーフティ
-  if (Array.isArray(targetKey)) {
-    tasks = targetKey
-    targetKey = getTodayKey()
+/** 🚨 修正：useTasks.js から送られてくるオブジェクト形式のデータを正しく解析して保存する */
+export function saveTasks(allTasks) {
+  // セーフティ：もし古い形式の配列が来たら当日に割り当てる
+  if (Array.isArray(allTasks)) {
+    const todayKey = getTodayKey()
+    const { completed, total } = computeStats(allTasks)
+    const currentData = loadAllDailyData()
+    currentData[todayKey] = { completed, total, tasks: allTasks }
+    saveAllDailyData(currentData)
+    return
   }
-
-  const data = loadAllDailyData()
-  const { completed, total } = computeStats(tasks || [])
 
   const cleaned = {}
   const yesterdayKey = getYesterdayKey()
   const keepYesterdayTasks = isCarryoverEnabled()
 
-  Object.entries(data).forEach(([key, record]) => {
-    if (!record) return
-    if (key === targetKey) return
+  // allTasks の中身をループして、それぞれの統計（completed, total）を再計算して整形
+  Object.entries(allTasks).forEach(([dateKey, value]) => {
+    if (!value) return
+
+    // value が直接タスク配列の場合と、{ tasks: [...] } オブジェクトの場合の両方に対応
+    const tasksArray = Array.isArray(value) ? value : value.tasks || []
+    const { completed, total } = computeStats(tasksArray)
+
+    cleaned[dateKey] = {
+      completed,
+      total,
+      tasks: tasksArray,
+    }
+  })
+
+  // データの欠落を防ぐため、既存のレコードで cleaned にないものも維持する
+  const existingData = loadAllDailyData()
+  Object.entries(existingData).forEach(([key, record]) => {
+    if (!record || cleaned[key]) return
 
     const base = {
       completed: record.completed ?? 0,
@@ -118,8 +119,6 @@ export function saveTasks(targetKey, tasks) {
       cleaned[key] = base
     }
   })
-
-  cleaned[targetKey] = { completed, total, tasks: tasks || [] }
 
   saveAllDailyData(cleaned)
 }

@@ -24,7 +24,7 @@ function App() {
     refresh()
   }, [refresh])
 
-  // useTasksからselectedDate, deleteTask, changeDateを受け取るように修正
+  // useTasksからselectedDate, deleteTask, changeDateを受け取る
   const {
     tasks,
     activeCount,
@@ -99,7 +99,16 @@ function App() {
             onChangeDate={changeDate}
           />
         )}
-        {view === 'calendar' && <CalendarPage records={records} />}
+        
+        {/* 🟢 修正：CalendarPageに画面遷移と日付変更の道具をしっかり手渡す！ */}
+        {view === 'calendar' && (
+          <CalendarPage 
+            records={records} 
+            onNavigate={setView} 
+            onChangeDate={changeDate} 
+          />
+        )}
+
         {view === 'settings' && (
           <SettingsPage
             carryoverMode={carryoverMode}

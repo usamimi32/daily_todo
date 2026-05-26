@@ -5,7 +5,7 @@ import { formatDateKeyLabel, getTodayKey } from '../../utils/date'
 /**
  * 選択した日付の達成データ
  */
-export function DayDetail({ dateKey, record, onClose }) {
+export function DayDetail({ dateKey, record, onClose, closeButtonText }) {
   const rate = getCompletionRate(record)
   const isToday = dateKey === getTodayKey()
   const hasData = record && record.total > 0
@@ -56,9 +56,9 @@ export function DayDetail({ dateKey, record, onClose }) {
               type="button"
               onClick={onClose}
               className="shrink-0 rounded-lg px-2 py-1 text-[0.8125rem] text-[var(--color-text-muted)] transition active:bg-[var(--color-accent-soft)]"
-              aria-label="閉じる"
+              aria-label={closeButtonText || '閉じる'}
             >
-              閉じる
+              {closeButtonText || '閉じる'}
             </button>
           </div>
         </motion.div>

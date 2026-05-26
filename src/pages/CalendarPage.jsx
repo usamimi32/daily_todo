@@ -6,7 +6,7 @@ import { formatMonthYear } from '../utils/date'
 /**
  * Calendar 画面（過去の達成確認）
  */
-export function CalendarPage({ records }) {
+export function CalendarPage({ records, onNavigate, onChangeDate }) {
   const now = new Date()
   const [viewYear, setViewYear] = useState(now.getFullYear())
   const [viewMonth, setViewMonth] = useState(now.getMonth())
@@ -34,6 +34,19 @@ export function CalendarPage({ records }) {
 
   const selectedRecord = selectedDateKey ? records[selectedDateKey] : null
 
+  // 🟢 「編集」ボタン押下時の処理（確実に日付を変えてからホームへ飛ばす！）
+  const handleEditSelectedDay = () => {
+    if (!selectedDateKey) return
+    
+    if (typeof onChangeDate === 'function') {
+      onChangeDate(selectedDateKey) // 先にホーム画面の日付を選択した日に書き換える
+    }
+    if (typeof onNavigate === 'function') {
+      onNavigate('today') // そのあとホーム画面（today）にジャンプ！
+    }
+    setSelectedDateKey(null)
+  }
+
   return (
     <div>
       <MonthCalendar
@@ -50,7 +63,8 @@ export function CalendarPage({ records }) {
       <DayDetail
         dateKey={selectedDateKey}
         record={selectedRecord}
-        onClose={() => setSelectedDateKey(null)}
+        closeButtonText="編集" // ボタンの文字を編集にする
+        onClose={handleEditSelectedDay} // クリックされたら上のワープ処理を実行
       />
 
       <p className="mt-10 text-center text-[0.75rem] leading-relaxed text-[var(--color-text-muted)]">
