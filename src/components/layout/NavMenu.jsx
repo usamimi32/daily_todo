@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 const NAV_ITEMS = [
   { id: 'today', label: 'Today' },
   { id: 'calendar', label: 'Calendar' },
-  { id: 'settings', label: '設定' },
+  { id: 'settings', label: 'Setting' },
 ]
 
 /**
