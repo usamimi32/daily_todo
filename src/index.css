@@ -33,18 +33,18 @@
     min-height: 100dvh;
   }
 
-  /* テーマ用 CSS 変数の初期値（ペールレッド） */
+  /* テーマ用 CSS 変数の初期値（ターコイズブルー） */
   :root {
-    --color-bg: #fcf2f2;
-    --color-surface: #fff9f9;
-    --color-accent: #e88a8a;
-    --color-accent-soft: #fce4e4;
-    --color-accent-hover: #d47070;
-    --color-text: #6b4a4a;
-    --color-title: #5a3e3e;
-    --color-text-muted: #a88080;
-    --color-border: #f0cccc;
-    --color-checkbox: #d47070;
-    --color-shadow: rgba(212, 112, 112, 0.14);
+    --color-bg: #f0f8f8;
+    --color-surface: #f7fdfd;
+    --color-accent: #58b8b8;
+    --color-accent-soft: #d8f0f0;
+    --color-accent-hover: #409898;
+    --color-text: #3e5a5a;
+    --color-title: #344c4c;
+    --color-text-muted: #789090;
+    --color-border: #c8e8e8;
+    --color-checkbox: #409898;
+    --color-shadow: rgba(64, 152, 152, 0.14);
   }
 }

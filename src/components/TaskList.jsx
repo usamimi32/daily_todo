@@ -13,18 +13,18 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { EmptyState } from './EmptyState'
 import { TaskItem } from './TaskItem'
 
 /**
  * ドラッグ並び替え対応のタスク一覧
- * 長押し（約300ms）でドラッグ開始 · 同じグループ内のみ並び替え可
  */
 export function TaskList({ tasks, onToggle, onUpdate, onReorder }) {
   const [editingId, setEditingId] = useState(null)
   const [activeId, setActiveId] = useState(null)
+
+  const taskIds = useMemo(() => tasks.map((t) => t.id), [tasks])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -38,20 +38,24 @@ export function TaskList({ tasks, onToggle, onUpdate, onReorder }) {
     }),
   )
 
-  const activeTask = tasks.find((t) => t.id === activeId)
+  const activeTask = useMemo(
+    () => (activeId ? tasks.find((t) => t.id === activeId) : null),
+    [activeId, tasks],
+  )
 
   const handleDragStart = (event) => {
     setEditingId(null)
-    setActiveId(event.active.id)
+    setActiveId(String(event.active.id))
   }
 
   const handleDragEnd = (event) => {
     const { active, over } = event
-    setActiveId(null)
 
     if (over && active.id !== over.id) {
-      onReorder(active.id, over.id)
+      onReorder(String(active.id), String(over.id))
     }
+
+    setActiveId(null)
   }
 
   const handleDragCancel = () => {
@@ -70,25 +74,23 @@ export function TaskList({ tasks, onToggle, onUpdate, onReorder }) {
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
-      <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
         <ul className="flex flex-col gap-1">
-          <AnimatePresence initial={false}>
-            {tasks.map((task) => (
-              <TaskItem
-                key={task.id}
-                task={task}
-                isEditing={editingId === task.id}
-                onToggle={onToggle}
-                onStartEdit={setEditingId}
-                onEndEdit={() => setEditingId(null)}
-                onSave={onUpdate}
-              />
-            ))}
-          </AnimatePresence>
+          {tasks.map((task) => (
+            <TaskItem
+              key={task.id}
+              task={task}
+              isEditing={editingId === task.id}
+              onToggle={onToggle}
+              onStartEdit={setEditingId}
+              onEndEdit={() => setEditingId(null)}
+              onSave={onUpdate}
+            />
+          ))}
         </ul>
       </SortableContext>
 
-      <DragOverlay dropAnimation={{ duration: 180, easing: 'ease-out' }}>
+      <DragOverlay dropAnimation={{ duration: 160, easing: 'ease-out' }}>
         {activeTask ? (
           <div className="flex items-start gap-3.5 rounded-xl bg-[var(--color-surface)] px-4 py-3.5 shadow-md ring-1 ring-[var(--color-border)]">
             <span

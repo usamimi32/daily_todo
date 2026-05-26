@@ -47,7 +47,7 @@ export function loadTasks() {
     return []
   }
 
-  return record.tasks
+  return record.tasks.map((task) => ({ ...task }))
 }
 
 /** 当日のタスクを保存（達成数も同時更新） */

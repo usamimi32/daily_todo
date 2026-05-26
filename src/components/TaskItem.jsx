@@ -4,10 +4,7 @@ import { motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 
 /**
- * 1件のタスク行
- * - チェックボックス: 完了切り替え
- * - テキスト: タップで編集
- * - 長押し: ドラッグ並び替え（dnd-kit）
+ * 1件のタスク行（dnd-kit 本体 + 打ち消し線のみ Framer Motion）
  */
 export function TaskItem({
   task,
@@ -34,9 +31,10 @@ export function TaskItem({
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition: isDragging ? transition : transition ?? undefined,
-    zIndex: isDragging ? 10 : undefined,
-    touchAction: isEditing ? 'auto' : 'none',
+    transition,
+    zIndex: isDragging ? 1 : undefined,
+    touchAction: isEditing ? 'auto' : 'manipulation',
+    opacity: isDragging ? 0.35 : 1,
   }
 
   useEffect(() => {
@@ -65,14 +63,10 @@ export function TaskItem({
   }
 
   return (
-    <motion.li
+    <li
       ref={setNodeRef}
       style={style}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: isDragging ? 0.4 : 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ opacity: { duration: 0.12 } }}
-      className={`list-none ${isDragging ? 'scale-[1.02] shadow-sm' : ''}`}
+      className={`list-none ${isDragging ? 'relative' : ''}`}
       {...attributes}
       {...listeners}
     >
@@ -81,7 +75,6 @@ export function TaskItem({
           isDragging ? 'ring-1 ring-[var(--color-border)]' : ''
         }`}
       >
-        {/* チェックボックスのみ完了切り替え */}
         <button
           type="button"
           onPointerDown={(e) => e.stopPropagation()}
@@ -120,7 +113,6 @@ export function TaskItem({
           </span>
         </button>
 
-        {/* テキスト: タップで編集 */}
         <div className="relative min-w-0 flex-1">
           {isEditing ? (
             <input
@@ -153,13 +145,13 @@ export function TaskItem({
               aria-label={`編集: ${task.text}`}
             >
               <span className="relative block min-w-0">
-                <motion.span
-                  animate={{ opacity: task.completed ? 0.45 : 1 }}
-                  transition={{ duration: 0.18 }}
-                  className="block break-words text-[1rem] leading-relaxed text-[var(--color-text)]"
+                <span
+                  className={`block break-words text-[1rem] leading-relaxed text-[var(--color-text)] transition-opacity duration-150 ${
+                    task.completed ? 'opacity-45' : 'opacity-100'
+                  }`}
                 >
                   {task.text}
-                </motion.span>
+                </span>
                 <motion.span
                   aria-hidden="true"
                   className="pointer-events-none absolute left-0 top-[54%] h-px w-full origin-left bg-[var(--color-text-muted)]/60"
@@ -172,6 +164,6 @@ export function TaskItem({
           )}
         </div>
       </div>
-    </motion.li>
+    </li>
   )
 }

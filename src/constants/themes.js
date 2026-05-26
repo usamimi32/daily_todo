@@ -3,17 +3,16 @@
  * 柔らかさを保ちつつ、少し鮮やかめのパステルで視認性を確保
  */
 
-/** テーマピッカー表示順（色相順: 赤 → 橙 → 黄 → 緑 → 青緑 → 青 → 青灰 → 灰 → 紫ピンク） */
+/** テーマピッカー表示順 */
 export const THEME_ORDER = [
-  'paleRed',
-  'paleOrange',
-  'cream',
-  'sageGreen',
   'turquoise',
   'mutedBlue',
   'navyGray',
+  'sageGreen',
+  'cream',
+  'paleOrange',
+  'paleRed',
   'gray',
-  'mauvePink',
 ]
 
 export const THEMES = {
@@ -181,8 +180,8 @@ export const THEMES = {
   },
 }
 
-/** デフォルトテーマ */
-export const DEFAULT_THEME_ID = 'paleRed'
+/** デフォルトテーマ（初回起動・未保存時） */
+export const DEFAULT_THEME_ID = 'turquoise'
 
 /** 旧テーマ ID → 新テーマ ID（LocalStorage 互換） */
 export const LEGACY_THEME_MAP = {
