@@ -14,14 +14,13 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { useMemo, useState } from 'react'
-import { DragHandle } from './DragHandle'
 import { EmptyState } from './EmptyState'
 import { TaskItem } from './TaskItem'
 
 /**
  * ドラッグ並び替え対応のタスク一覧
  */
-export function TaskList({ tasks, onToggle, onUpdate, onReorder }) {
+export function TaskList({ tasks, onToggle, onUpdate, onReorder, onDelete }) {
   const [editingId, setEditingId] = useState(null)
   const [activeId, setActiveId] = useState(null)
 
@@ -29,10 +28,10 @@ export function TaskList({ tasks, onToggle, onUpdate, onReorder }) {
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { delay: 280, tolerance: 6 },
+      activationConstraint: { delay: 250, tolerance: 5 },
     }),
     useSensor(TouchSensor, {
-      activationConstraint: { delay: 320, tolerance: 8 },
+      activationConstraint: { delay: 250, tolerance: 5 },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
@@ -86,6 +85,7 @@ export function TaskList({ tasks, onToggle, onUpdate, onReorder }) {
               onStartEdit={setEditingId}
               onEndEdit={() => setEditingId(null)}
               onSave={onUpdate}
+              onDelete={onDelete}
             />
           ))}
         </ul>
@@ -104,7 +104,6 @@ export function TaskList({ tasks, onToggle, onUpdate, onReorder }) {
             <span className="min-w-0 flex-1 text-[1rem] leading-relaxed text-[var(--color-text)]">
               {activeTask.text}
             </span>
-            <DragHandle className="min-h-[2.75rem] min-w-[2rem] -mr-1" />
           </div>
         ) : null}
       </DragOverlay>

@@ -13,6 +13,7 @@ export function TodayPage({
   onToggle,
   onUpdate,
   onReorder,
+  onDelete,
 }) {
   return (
     <>
@@ -23,6 +24,7 @@ export function TodayPage({
         onToggle={onToggle}
         onUpdate={onUpdate}
         onReorder={onReorder}
+        onDelete={onDelete}
       />
     </>
   )

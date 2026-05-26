@@ -2,7 +2,6 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
-import { DragHandle } from './DragHandle'
 
 /**
  * 1件のタスク行（dnd-kit 本体 + 打ち消し線のみ Framer Motion）
@@ -14,6 +13,7 @@ export function TaskItem({
   onStartEdit,
   onEndEdit,
   onSave,
+  onDelete, // 1. onDeleteをpropsに追加
 }) {
   const inputRef = useRef(null)
   const [draft, setDraft] = useState(task.text)
@@ -28,7 +28,7 @@ export function TaskItem({
   } = useSortable({
     id: task.id,
     disabled: isEditing,
-  })
+     })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -165,8 +165,18 @@ export function TaskItem({
           )}
         </div>
 
-        {/* 並び替えハンドル（表示のみ）— 将来 dragListeners={listeners} を渡して li 側の listeners を外す */}
-        <DragHandle className="min-h-[2.75rem] min-w-[2rem] -mr-1" />
+        {/* 削除ボタン */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            onDelete(task.id)
+          }}
+          aria-label="削除"
+          className="min-h-[2.75rem] min-w-[2rem] -mr-1 flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition"
+        >
+          ×
+        </button>
       </div>
     </li>
   )

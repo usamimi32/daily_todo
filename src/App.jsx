@@ -24,8 +24,20 @@ function App() {
     refresh()
   }, [refresh])
 
-  const { tasks, activeCount, totalCount, addTask, toggleTask, updateTask, reorderTasks, reloadTasks } =
-    useTasks(handleDataChange)
+  // useTasksからselectedDate, deleteTask, changeDateを受け取るように修正
+  const {
+    tasks,
+    activeCount,
+    totalCount,
+    addTask,
+    toggleTask,
+    updateTask,
+    reorderTasks,
+    reloadTasks,
+    selectedDate,
+    deleteTask,
+    changeDate,
+  } = useTasks(handleDataChange)
 
   useEffect(() => {
     if (view === 'calendar') refresh()
@@ -46,9 +58,10 @@ function App() {
     [setPreference],
   )
 
+  // view === 'today' の時のタイトルでDateHeaderにselectedDate, changeDateを渡す
   const title =
     view === 'today' ? (
-      <DateHeader />
+      <DateHeader selectedDate={selectedDate} onChangeDate={changeDate} />
     ) : view === 'calendar' ? (
       <h1 className="text-[1.35rem] font-medium leading-snug tracking-wide text-[var(--color-title)]">
         Calendar
@@ -77,10 +90,13 @@ function App() {
             tasks={tasks}
             activeCount={activeCount}
             totalCount={totalCount}
+            selectedDate={selectedDate}
             onAdd={addTask}
             onToggle={toggleTask}
             onUpdate={updateTask}
+            onDelete={deleteTask}
             onReorder={reorderTasks}
+            onChangeDate={changeDate}
           />
         )}
         {view === 'calendar' && <CalendarPage records={records} />}

@@ -68,42 +68,44 @@ function isCarryoverEnabled() {
   return loadCarryoverMode() === CARRYOVER_MODE.CARRYOVER
 }
 
-/** 当日のタスク一覧を読み込む（引き継ぎ設定に応じて前日分を復元） */
-export function loadTasks() {
-  const todayKey = getTodayKey()
-  const record = getDayRecord(todayKey)
+/** 指定された日付（または当日）のタスク一覧を読み込む */
+export function loadTasks(dateKey = getTodayKey()) {
+  const record = getDayRecord(dateKey)
 
   if (record?.tasks && Array.isArray(record.tasks) && record.tasks.length > 0) {
     return record.tasks.map((task) => ({ ...task }))
   }
 
-  if (!isCarryoverEnabled()) {
-    return []
+  // 当日かつ引き継ぎ有効の場合のみ前日分を復元
+  if (dateKey === getTodayKey() && isCarryoverEnabled()) {
+    const yesterdayKey = getYesterdayKey()
+    const yesterday = getDayRecord(yesterdayKey)
+    if (yesterday?.tasks?.length) {
+      return normalizeTasks(buildCarriedOverTasks(yesterday.tasks))
+    }
   }
 
-  const yesterdayKey = getYesterdayKey()
-  const yesterday = getDayRecord(yesterdayKey)
-  if (!yesterday?.tasks?.length) {
-    return []
-  }
-
-  return normalizeTasks(buildCarriedOverTasks(yesterday.tasks))
+  return []
 }
 
-/** 当日のタスクを保存（達成数も同時更新） */
-export function saveTasks(tasks) {
+/** 指定された日付のタスクを保存（達成数も同時更新） */
+export function saveTasks(targetKey, tasks) {
+  // もし第1引数が配列（古い呼び出し形式）だった場合のセーフティ
+  if (Array.isArray(targetKey)) {
+    tasks = targetKey
+    targetKey = getTodayKey()
+  }
+
   const data = loadAllDailyData()
-  const todayKey = getTodayKey()
-  const { completed, total } = computeStats(tasks)
+  const { completed, total } = computeStats(tasks || [])
 
   const cleaned = {}
-
   const yesterdayKey = getYesterdayKey()
   const keepYesterdayTasks = isCarryoverEnabled()
 
   Object.entries(data).forEach(([key, record]) => {
     if (!record) return
-    if (key === todayKey) return
+    if (key === targetKey) return
 
     const base = {
       completed: record.completed ?? 0,
@@ -117,7 +119,7 @@ export function saveTasks(tasks) {
     }
   })
 
-  cleaned[todayKey] = { completed, total, tasks }
+  cleaned[targetKey] = { completed, total, tasks: tasks || [] }
 
   saveAllDailyData(cleaned)
 }
